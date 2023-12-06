@@ -75,7 +75,7 @@ function gallerySB(imgTtl) {
 gallerySB(imgTtl);
 
 
-//FILTRES
+//***********************FILTRES****************************//
 let catgTtls = ["Tous", "Objets", "Appartements", "Hôtels&Restaurants"];
 //création des boutons
 function catgBtn(catgTtls) {
@@ -126,7 +126,7 @@ function filters() {
     });
 }
 
-//creation edit button//
+//*********************Bouton edit************************//
 function btnEditHp() {
     const linkEdit = document.createElement("a");
     linkEdit.classList.add("js-modal")
@@ -144,7 +144,7 @@ function btnEditHp() {
     ttlEdit.appendChild(linkEdit);
 }
 
-//APPEARENCE
+//****************Home page - Login et Logout*********************//
 function homePageAppearence() {
     const logIn = document.getElementById("logIn");
     const userConnected = localStorage.getItem("token");
@@ -173,10 +173,7 @@ function homePageAppearence() {
 }
 homePageAppearence();
 
-
-
-
-//MODAL//
+//************* Modal - interface/layout*********************//
 function openModal() {
     const btnEdit = document.querySelector(".btnEdit");
        
@@ -187,7 +184,7 @@ function openModal() {
 }
 openModal();
 
-
+//Modal permettant d'effacer les photos.
 function ModalDel() {
     btnQuit.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
@@ -205,6 +202,7 @@ function ModalDel() {
 }
 ModalDel();
 
+//Retour à la première modal
 function mdlMoveBack() {
     iconBack.addEventListener("click", function () {
         modalSB.classList.remove("displayOff");
@@ -213,6 +211,7 @@ function mdlMoveBack() {
 }
 mdlMoveBack();
 
+//Modal permettant d'ajouter des photos.
 function mdlAddClose(){
     iconQuit.addEventListener("click", function () {
         bckgrnd.classList.add("displayOff");
@@ -239,6 +238,7 @@ function mdlAddClose(){
 }
 mdlAddClose();
 
+//Bouton - ajout des photos.
 function addPhotoInput(){
     lblinputPh.addEventListener("click", function() {
         btnUpload.click();
@@ -247,7 +247,7 @@ function addPhotoInput(){
 addPhotoInput();
 
 
-
+//************************Requests API********************//
 //DELETE//
 const btnTrash = document.querySelectorAll(".blackbg");
 for (let index = 0; index < btnTrash.length; index++) {
