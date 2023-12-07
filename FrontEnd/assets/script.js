@@ -23,7 +23,6 @@ const picAddPhoto = document.querySelector(".photoAdd");
 const iconAddPhoto = document.querySelector(".photoAdd i");
 const labelAddPhoto = document.querySelector(".photoAdd label");
 const paraghAddPhoto = document.querySelector(".photoAdd p");
-const galSectWork = document.querySelector(".gallery figure");
 const btnValider = document.getElementById("valider");
 
 //Récuperation des images dynamiquement.
@@ -152,24 +151,22 @@ function homePageAppearence() {
         logIn.innerHTML="logout";
         logIn.setAttribute("id", "logOut")
         btnEditHp();
-        
+                
     } else {
         catgBtn(catgTtls);
         filters();
     }
     const logOut =document.getElementById("logOut");
-    const index2 =document.getElementById("2index");
-    logOut.addEventListener("click", () => {
-    const confirmBox = confirm("Êtes-vous sûr(e) de vouloir vous déconnecter?")
+        logOut.addEventListener("click", () => {
+        const confirmBox = confirm("Êtes-vous sûr(e) de vouloir vous déconnecter?")
         if(confirmBox){
         localStorage.removeItem("token");
-        index2.setAttribute("href", "http://127.0.0.1:5500/FrontEnd/index.html")
-        }else{
-            alert("problema");
+        window.location.href="http://127.0.0.1:5500/FrontEnd/index.html";
+        logOut.innerHTML="login";
+        logOut.setAttribute("id", "logIn")
         }
-
     });
-   
+    
 }
 homePageAppearence();
 
@@ -179,7 +176,6 @@ function openModal() {
        
     btnEdit.addEventListener("click", () => {
         bckgrnd.classList.remove("displayOff");
-        modalContainer.classList.remove("aria-hidden");
     });
 }
 openModal();
@@ -216,12 +212,10 @@ function mdlAddClose(){
     iconQuit.addEventListener("click", function () {
         bckgrnd.classList.add("displayOff");
         modalSB.classList.remove("displayOff");
-        modalContainer.classList.remove("aria-hidden");
     });
     bckgrnd.addEventListener("click", () =>{
         bckgrnd.classList.add("displayOff");
         modalSB.classList.remove("displayOff");
-        modalContainer.classList.remove("aria-hidden");
     })
     modalAdd.addEventListener("click", (e) =>{
         e.stopPropagation();
@@ -231,7 +225,6 @@ function mdlAddClose(){
     if(e.key === 'Escape' || e.key === 'Esc'){
         bckgrnd.classList.add("displayOff");
         modalSB.classList.remove("displayOff");
-        modalContainer.classList.remove("aria-hidden");           
         }
     });
 
@@ -240,8 +233,8 @@ mdlAddClose();
 
 //Bouton - ajout des photos.
 function addPhotoInput(){
-    lblinputPh.addEventListener("click", function() {
-        btnUpload.click();
+    lblinputPh.addEventListener("click", function(event) {
+        event.btnUpload;
     })
 }
 addPhotoInput();
@@ -265,13 +258,14 @@ for (let index = 0; index < btnTrash.length; index++) {
                     "Content-Type": "application/json",
                     "id": localStorage.getItem("last-work-id-deleted")
                 }
-            };
-            let response = await fetch(request, option);//204
-            let respApiJson = await response.json();
-        }
-        catch {
+            }
+                               
+            let response = await fetch(request, option);
+            if (response.ok);
+                alert("Êtes-vous sûr(e) de vouloir effacer cette image?");
+            }
+            catch {
             alert("Une erreur innatendue vient de se produire");
-
         }
     });
 };
@@ -294,7 +288,7 @@ btnUpload.addEventListener("change", () => {
 formUpload.addEventListener("submit", async function (event) {
     event.preventDefault();
     const tokenLS = localStorage.getItem("token");
-    const formData = new FormData();//?
+    const formData = new FormData();
     const catgVal = event.target.querySelector("[name=category]").value;
     let catgId="";
     if (catgVal === "Objets") {
@@ -320,16 +314,15 @@ formUpload.addEventListener("submit", async function (event) {
         }
     })
         .then(function (response) {
-            console.log(response);
             return response.blob();
             
         })
         .then(function (blob) {
+            const galSectWork = document.querySelector(".gallery figure");
             const urlObj = URL.createObjectURL(blob);
             const img = document.createElement("img");
             img.src = urlObj;
             galSectWork.appendChild(img);
-            console.log(img);
         })
         .catch(function (error) {
             console.log(error);
