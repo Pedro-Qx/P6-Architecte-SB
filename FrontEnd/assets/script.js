@@ -1,16 +1,15 @@
 const answer = await fetch("http://localhost:5678/api/works");
 const imgTtl = await answer.json();
 
-
 //Récupération - Éléments généraux
 const modalContainer = document.getElementById("modalContainer");
-const bckgrnd =document.getElementById("bckgrnd");
+const bckgrnd = document.getElementById("bckgrnd");
 const modalSB = document.querySelector(".modal");
 
-    //Modal - Supprimer photos 
+//Modale - Supprimer photos 
 const btnQuit = document.getElementById("quit");
 const btnAddPh = document.querySelector(".btnAdd");
-    //Modal - Ajouter photos
+//Modale - Ajouter photos
 const modalAdd = document.querySelector(".modalAdd");
 const iconQuit = document.getElementById("quit2");
 const iconBack = document.getElementById("back");
@@ -44,7 +43,7 @@ function gallerySB(imgTtl) {
         sectionWork.appendChild(imgWork);
         sectionWork.appendChild(ttlWork);
 
-        //modal
+        //modale
         const arrayImages = [works.imageUrl];
         const sbPhotos = document.querySelector(".SB-works");
 
@@ -54,7 +53,7 @@ function gallerySB(imgTtl) {
             const divIcon = document.createElement("div");
             divIcon.classList.add("blackbg");
             let workId = "";
-            divIcon.dataset.workId = works.id//!!
+            divIcon.dataset.workId = works.id
             sectionWork.appendChild(divIcon);
 
             divIcon.appendChild(iconTrash);
@@ -65,7 +64,7 @@ function gallerySB(imgTtl) {
         sectionWorkClon.dataset.workId = works.id;
         sbPhotos.appendChild(sectionWorkClon);
         sectionWorkClon.querySelector("figcaption").innerText = works.title;
-        //pour éviter que les titres s'affiche dans la modal.
+        //pour éviter que les titres s'affichent dans la modale.
         if (document.querySelector(".SB-works")) {
             sectionWorkClon.querySelector("figcaption").remove();
         }
@@ -81,6 +80,7 @@ function catgBtn(catgTtls) {
     for (let i = 0; i < catgTtls.length; i++) {
         const multpl = catgTtls[i];
         const btns = document.createElement("button");
+        btns.classList.add("btnBeigBckg");
         btns.innerText = multpl;
         const filtersDiv = document.getElementById("filters");
         filtersDiv.appendChild(btns);
@@ -91,37 +91,24 @@ function filters() {
     const btnsCtg = document.querySelectorAll("button");
     const gallery = document.querySelector(".gallery");
 
-    btnsCtg[0].addEventListener("click", function () {
-        const tousCatg = imgTtl.filter(function (imgTtl) {
-            return imgTtl.id < imgTtl.length;
-        })
-        gallery.innerHTML = "";
-        gallerySB(imgTtl);
-    });
+    btnsCtg.forEach((btn, index) => {
+        btn.addEventListener("click", function () {
+            btnsCtg.forEach(b => b.classList.remove("btnGreenBckg", "btnBeigBckg"));
+            btnsCtg.forEach((b, i) => {
+                if (i !== index) {
+                    b.classList.add("btnBeigBckg");
+                } else {
+                    b.classList.add("btnGreenBckg");
+                }
+            });
 
-    btnsCtg[1].addEventListener("click", function () {
-        const objCatg = imgTtl.filter(function (imgTtl) {
-            return imgTtl.category.id === 1;
+            const filteredImages = imgTtl.filter(function (imgTtl) {
+                return index === 0 || imgTtl.category.id === index;
+            });
+
+            gallery.innerHTML = "";
+            gallerySB(filteredImages);
         });
-        gallery.innerHTML = "";
-        gallerySB(objCatg);
-    });
-
-    btnsCtg[2].addEventListener("click", function () {
-        const appartCatg = imgTtl.filter(function (imgTtl) {
-            return imgTtl.category.id === 2;
-        });
-
-        gallery.innerHTML = "";
-        gallerySB(appartCatg);
-    });
-
-    btnsCtg[3].addEventListener("click", function () {
-        const HtlCatg = imgTtl.filter(function (imgTtl) {
-            return imgTtl.category.id === 3;
-        });
-        gallery.innerHTML = "";
-        gallerySB(HtlCatg);
     });
 }
 
@@ -148,57 +135,57 @@ function homePageAppearence() {
     const logIn = document.getElementById("logIn");
     const userConnected = localStorage.getItem("token");
     if (userConnected) {
-        logIn.innerHTML="logout";
+        logIn.innerHTML = "logout";
         logIn.setAttribute("id", "logOut")
         btnEditHp();
-                
+
     } else {
         catgBtn(catgTtls);
         filters();
     }
-    const logOut =document.getElementById("logOut");
-        logOut.addEventListener("click", () => {
+    const logOut = document.getElementById("logOut");
+    logOut.addEventListener("click", () => {
         const confirmBox = confirm("Êtes-vous sûr(e) de vouloir vous déconnecter?")
-        if(confirmBox){
-        localStorage.removeItem("token");
-        window.location.href="http://127.0.0.1:5500/FrontEnd/index.html";
-        logOut.innerHTML="login";
-        logOut.setAttribute("id", "logIn")
+        if (confirmBox) {
+            localStorage.removeItem("token");
+            window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
+            logOut.innerHTML = "login";
+            logOut.setAttribute("id", "logIn")
         }
     });
-    
+
 }
 homePageAppearence();
 
-//************* Modal - interface/layout*********************//
+//************* Modale - interface/layout*********************//
 function openModal() {
     const btnEdit = document.querySelector(".btnEdit");
-       
+
     btnEdit.addEventListener("click", () => {
         bckgrnd.classList.remove("displayOff");
     });
 }
 openModal();
 
-//Modal permettant d'effacer les photos.
+//Modale permettant d'effacer les photos.
 function ModalDel() {
     btnQuit.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
     });
-    bckgrnd.addEventListener("click", () =>{
+    bckgrnd.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
     })
-    modalSB.addEventListener("click", (e) =>{
+    modalSB.addEventListener("click", (e) => {
         e.stopPropagation();
     })
     btnAddPh.addEventListener("click", function () {
         modalSB.classList.add("displayOff");
     })
-    
+
 }
 ModalDel();
 
-//Retour à la première modal
+//Retour à la première modale
 function mdlMoveBack() {
     iconBack.addEventListener("click", function () {
         modalSB.classList.remove("displayOff");
@@ -207,24 +194,24 @@ function mdlMoveBack() {
 }
 mdlMoveBack();
 
-//Modal permettant d'ajouter des photos.
-function mdlAddClose(){
+//Modale permettant d'ajouter des photos.
+function mdlAddClose() {
     iconQuit.addEventListener("click", function () {
         bckgrnd.classList.add("displayOff");
         modalSB.classList.remove("displayOff");
     });
-    bckgrnd.addEventListener("click", () =>{
+    bckgrnd.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
         modalSB.classList.remove("displayOff");
     })
-    modalAdd.addEventListener("click", (e) =>{
+    modalAdd.addEventListener("click", (e) => {
         e.stopPropagation();
     })
 
-    window.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' || e.key === 'Esc'){
-        bckgrnd.classList.add("displayOff");
-        modalSB.classList.remove("displayOff");
+    window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            bckgrnd.classList.add("displayOff");
+            modalSB.classList.remove("displayOff");
         }
     });
 
@@ -232,8 +219,8 @@ function mdlAddClose(){
 mdlAddClose();
 
 //Bouton - ajout des photos.
-function addPhotoInput(){
-    lblinputPh.addEventListener("click", function(event) {
+function addPhotoInput() {
+    lblinputPh.addEventListener("click", function (event) {
         event.btnUpload;
     })
 }
@@ -246,28 +233,22 @@ const btnTrash = document.querySelectorAll(".blackbg");
 for (let index = 0; index < btnTrash.length; index++) {
     const workId = btnTrash[index].dataset.workId;
     btnTrash[index].addEventListener("click", async function (event) {
-        event.preventDefault();
-        try {
-            const tokenLS = localStorage.getItem("token");
-            localStorage.setItem("last-work-id-deleted", workId);
-            let request = new Request(`http://localhost:5678/api/works/${workId}`);
-            let option = {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${tokenLS}`,
-                    "Content-Type": "application/json",
-                    "id": localStorage.getItem("last-work-id-deleted")
+        event.preventDefault()
+            if (window.confirm("Êtes-vous sûr(e) de vouloir effacer cette image?")){
+                const tokenLS = localStorage.getItem("token")
+                localStorage.setItem("last-work-id-deleted", workId)
+                let request = new Request(`http://localhost:5678/api/works/${workId}`)
+                let option = {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${tokenLS}`,
+                        "Content-Type": "application/json",
+                        "id": localStorage.getItem("last-work-id-deleted")
+                    }
                 }
+                let response = await fetch(request, option);
             }
-                               
-            let response = await fetch(request, option);
-            if (response.ok);
-                alert("Êtes-vous sûr(e) de vouloir effacer cette image?");
-            }
-            catch {
-            alert("Une erreur innatendue vient de se produire");
-        }
-    });
+    })
 };
 
 //POST//
@@ -277,7 +258,7 @@ btnUpload.addEventListener("change", () => {
     const img = document.createElement("img");
     img.src = urlPhotos;
     picAddPhoto.appendChild(img);
-    if (picAddPhoto.appendChild(img)){
+    if (picAddPhoto.appendChild(img)) {
         iconAddPhoto.classList.add("displayOff");
         labelAddPhoto.classList.add("displayOff");
         paraghAddPhoto.classList.add("displayOff");
@@ -290,7 +271,7 @@ formUpload.addEventListener("submit", async function (event) {
     const tokenLS = localStorage.getItem("token");
     const formData = new FormData();
     const catgVal = event.target.querySelector("[name=category]").value;
-    let catgId="";
+    let catgId = "";
     if (catgVal === "Objets") {
         catgId = "1";
     }
@@ -303,8 +284,8 @@ formUpload.addEventListener("submit", async function (event) {
     formData.append("category", catgId);
     formData.append("title", event.target.querySelector("[name=phName]").value)
     formData.append("image", event.target.querySelector("[name=file]").files[0])
-    
-    
+
+
     const request = await fetch(`http://localhost:5678/api/works`, {
         method: "POST",
         body: formData,
@@ -315,7 +296,7 @@ formUpload.addEventListener("submit", async function (event) {
     })
         .then(function (response) {
             return response.blob();
-            
+
         })
         .then(function (blob) {
             const galSectWork = document.querySelector(".gallery figure");

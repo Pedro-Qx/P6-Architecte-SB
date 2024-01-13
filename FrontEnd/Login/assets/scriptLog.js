@@ -14,8 +14,7 @@ function loginSend () {
         headers: {"content-Type": "application/json"},
         body: JSON.stringify(dataLogin)
     });
-    const answr = await dataSendApi.json(); //la réponse obtenue concerne le champ renseigner. La réponse est un objet, pas un array. map fonctionne avec des Arrays.
-    //pour pouvoir obtenir un array il faut utiliser la méthode Object.
+    const answr = await dataSendApi.json();
    
    if (answr.token){
     localStorage.setItem("token", answr.token);
