@@ -1,7 +1,7 @@
 const answer = await fetch("http://localhost:5678/api/works");
 const imgTtl = await answer.json();
 
-//Récupération - Éléments généraux
+//***************Récupération - Éléments généraux******************//
 const modalContainer = document.getElementById("modalContainer");
 const bckgrnd = document.getElementById("bckgrnd");
 const modalSB = document.querySelector(".modal");
@@ -55,7 +55,6 @@ function gallerySB(imgTtl) {
             let workId = "";
             divIcon.dataset.workId = works.id
             sectionWork.appendChild(divIcon);
-
             divIcon.appendChild(iconTrash);
         });
 
@@ -86,7 +85,7 @@ function catgBtn(catgTtls) {
         filtersDiv.appendChild(btns);
     }
 }
-
+//changement de couleurs
 function filters() {
     const btnsCtg = document.querySelectorAll("button");
     const gallery = document.querySelector(".gallery");
@@ -101,7 +100,7 @@ function filters() {
                     b.classList.add("btnGreenBckg");
                 }
             });
-
+//images qu'apparaissent
             const filteredImages = imgTtl.filter(function (imgTtl) {
                 return index === 0 || imgTtl.category.id === index;
             });
@@ -247,6 +246,15 @@ for (let index = 0; index < btnTrash.length; index++) {
                     }
                 }
                 let response = await fetch(request, option);
+                                
+                if (response.ok){
+                    //recharger la page
+                    location.reload ();
+                } else {
+                    alert("Une erreur est survenue. Veuillez réessayer.")
+                }
+
+                
             }
     })
 };
