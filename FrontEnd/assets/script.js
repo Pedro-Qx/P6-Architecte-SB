@@ -1,5 +1,6 @@
 const answer = await fetch("http://localhost:5678/api/works");
 const imgTtl = await answer.json();
+console.log(imgTtl);
 
 //***************Récupération - Éléments généraux******************//
 const modalContainer = document.getElementById("modalContainer");
@@ -24,58 +25,68 @@ const labelAddPhoto = document.querySelector(".photoAdd label");
 const paraghAddPhoto = document.querySelector(".photoAdd p");
 const btnValider = document.getElementById("valider");
 
-//Récuperation des images dynamiquement.
+
+//*************Galerie d'images****************/
+
 function gallerySB(imgTtl) {
-
     for (let i = 0; i < imgTtl.length; i++) {
-
-        //création éléments
+      //création éléments
         const works = imgTtl[i]
         const gallery = document.querySelector(".gallery");
         const sectionWork = document.createElement("figure");
-        const imgWork = document.createElement("img");
+        const imgWork = document.createElement("img");        
         imgWork.src = works.imageUrl;
         const ttlWork = document.createElement("figcaption");
         ttlWork.innerText = works.title;
-
-        //rattachement DOM
-        gallery.appendChild(sectionWork);
-        sectionWork.appendChild(imgWork);
-        sectionWork.appendChild(ttlWork);
-
-        //modale
-        const arrayImages = [works.imageUrl];
-        const sbPhotos = document.querySelector(".SB-works");
-
-        arrayImages.forEach(element => {
-            const iconTrash = document.createElement("i");
-            iconTrash.classList.add("fa-solid", "fa-trash");
-            const divIcon = document.createElement("div");
-            divIcon.classList.add("blackbg");
-            let workId = "";
-            divIcon.dataset.workId = works.id
-            sectionWork.appendChild(divIcon);
-            divIcon.appendChild(iconTrash);
-        });
-
-        let sectionWorkClon = sectionWork.cloneNode(true);
-        sectionWorkClon.classList.add("clone");
-        sectionWorkClon.dataset.workId = works.id;
-        sbPhotos.appendChild(sectionWorkClon);
-        sectionWorkClon.querySelector("figcaption").innerText = works.title;
-        //pour éviter que les titres s'affichent dans la modale.
-        if (document.querySelector(".SB-works")) {
-            sectionWorkClon.querySelector("figcaption").remove();
-        }
+      //rattachement DOM
+      gallery.appendChild(sectionWork);
+      sectionWork.appendChild(imgWork);
+      sectionWork.appendChild(ttlWork);
     }
-}
-gallerySB(imgTtl);
+  }
+gallerySB (imgTtl);
 
+//******************Modale***************//
+
+function modal(imgTtl) {
+    // Elementos que se muestran en la modal
+    //const gallery = document.querySelector(".gallery");
+    const sbPhotos = document.querySelector(".SB-works");
+        
+    imgTtl.forEach((work) => {
+        let sectionWork = document.createElement("figure");
+        
+        const imgWork = document.createElement("img");
+        
+        imgWork.src = work.imageUrl;
+        // Configuramos el dataset para la imagen
+        sectionWork.dataset.workId = work.id; //a figure le estoy agregando un dataset "work-id" que le digo que será igual al id del elemento actual.
+        
+        // Configuramos el dataset para el ícono
+        const iconTrash = document.createElement("i");
+        iconTrash.classList.add("fa-solid", "fa-trash");
+        const divIcon = document.createElement("div");
+        divIcon.classList.add("blackbg");
+        divIcon.dataset.workId = work.id; // Para que se borren al mismo tiempo la imagen y el ícono.
+        // Añadimos los elementos al DOM
+        sectionWork.appendChild(imgWork);
+        divIcon.appendChild(iconTrash);
+        sectionWork.appendChild(divIcon);
+        sbPhotos.appendChild(sectionWork);
+    });
+}
+
+modal(imgTtl);
 
 //***********************FILTRES****************************//
-let catgTtls = ["Tous", "Objets", "Appartements", "Hôtels&Restaurants"];
+let catDynamik = await fetch("http://localhost:5678/api/categories");
+let catDynAnsw = await catDynamik.json();
+let catgTtls = catDynAnsw.map(cat => cat.name);
+
 //création des boutons
 function catgBtn(catgTtls) {
+    
+    catgTtls.unshift("Tous");
     for (let i = 0; i < catgTtls.length; i++) {
         const multpl = catgTtls[i];
         const btns = document.createElement("button");
@@ -147,7 +158,7 @@ function homePageAppearence() {
         const confirmBox = confirm("Êtes-vous sûr(e) de vouloir vous déconnecter?")
         if (confirmBox) {
             localStorage.removeItem("token");
-            window.location.href = "http://127.0.0.1:5500/FrontEnd/index.html";
+            window.location.href = "http://127.0.0.1:5500/index.html";
             logOut.innerHTML = "login";
             logOut.setAttribute("id", "logIn")
         }
@@ -233,33 +244,44 @@ for (let index = 0; index < btnTrash.length; index++) {
     const workId = btnTrash[index].dataset.workId;
     btnTrash[index].addEventListener("click", async function (event) {
         event.preventDefault()
-            if (window.confirm("Êtes-vous sûr(e) de vouloir effacer cette image?")){
-                const tokenLS = localStorage.getItem("token")
-                localStorage.setItem("last-work-id-deleted", workId)
-                let request = new Request(`http://localhost:5678/api/works/${workId}`)
-                let option = {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${tokenLS}`,
-                        "Content-Type": "application/json",
-                        "id": localStorage.getItem("last-work-id-deleted")
-                    }
+        if (window.confirm("Êtes-vous sûr(e) de vouloir effacer cette image?")){
+            const tokenLS = localStorage.getItem("token")
+            localStorage.setItem("last-work-id-deleted", workId);
+            const indxImgTtl = imgTtl.findIndex(item => item.id === workId); // index des éléments = workId
+            imgTtl.splice(indxImgTtl, 1); //j'efface l'élément actuel du tableau.
+            let request = new Request(`http://localhost:5678/api/works/${workId}`);
+            let option = {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${tokenLS}`,
+                    "Content-Type": "application/json",
+                    "id": localStorage.getItem("last-work-id-deleted")
                 }
-                let response = await fetch(request, option);
-                                
-                if (response.ok){
-                    //recharger la page
-                    location.reload ();
-                } else {
-                    alert("Une erreur est survenue. Veuillez réessayer.")
-                }
-
+            };
+        let response = await fetch(request, option);
+        console.log(response);
+        bckgrnd.classList.add("displayOff");
+                                                
+        if (response.ok){
+            //j'efface les éléments de la modale
+            const modalSB = document.querySelector(".SB-works");
+            modalSB.innerHTML="";
+            modal(imgTtl);
+            //j'efface les éléments de la galerie 
+            const gallery = document.querySelector(".gallery");
+            gallery.innerHTML="";
+            gallerySB(imgTtl);
                 
-            }
-    })
-};
+        } else {
+                alert("Une erreur est survenue. Veuillez réessayer.");
+          };
+        }
+    });
+}
 
-//POST//
+
+//*******************POST******************************//
+//Modale - ajout de photo
 btnUpload.addEventListener("change", () => {
     let imgLocal = btnUpload.files[0];
     const urlPhotos = URL.createObjectURL(imgLocal);
@@ -273,7 +295,7 @@ btnUpload.addEventListener("change", () => {
     }
 });
 
-
+//
 formUpload.addEventListener("submit", async function (event) {
     event.preventDefault();
     const tokenLS = localStorage.getItem("token");
@@ -293,7 +315,17 @@ formUpload.addEventListener("submit", async function (event) {
     formData.append("title", event.target.querySelector("[name=phName]").value)
     formData.append("image", event.target.querySelector("[name=file]").files[0])
 
-
+    //J'efface la petite image de la photo à ajouter et j'efface le champ Titre.
+    const picPh = document.querySelector(".photoAdd img");
+    const phNameForm = document.getElementById("phName");
+    phNameForm.value=""; 
+    picPh.remove();
+    
+    //Je fais ré apparaître l'interface pour ajouter une photo.
+    iconAddPhoto.classList.remove("displayOff");
+    labelAddPhoto.classList.remove("displayOff");
+    paraghAddPhoto.classList.remove("displayOff");
+    
     const request = await fetch(`http://localhost:5678/api/works`, {
         method: "POST",
         body: formData,
@@ -301,19 +333,19 @@ formUpload.addEventListener("submit", async function (event) {
             "Accept": "application/json",
             "Authorization": `Bearer ${tokenLS}`,
         }
-    })
-        .then(function (response) {
-            return response.blob();
 
-        })
-        .then(function (blob) {
-            const galSectWork = document.querySelector(".gallery figure");
-            const urlObj = URL.createObjectURL(blob);
-            const img = document.createElement("img");
-            img.src = urlObj;
-            galSectWork.appendChild(img);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+    })
+    bckgrnd.classList.add("displayOff");
+    modalSB.classList.remove("displayOff");
+
+    if (request.ok){
+        const response = await request.json();
+        imgTtl.push(response);
+        const modalSB = document.querySelector(".SB-works");
+        modalSB.innerHTML="";
+        modal(imgTtl);
+        const gallery = document.querySelector(".gallery");
+        gallery.innerHTML="";
+        gallerySB(imgTtl);
+    }       
 });
