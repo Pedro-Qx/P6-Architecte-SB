@@ -1,106 +1,81 @@
-const answer = await fetch("http://localhost:5678/api/works");
-const imgTtl = await answer.json();
-console.log(imgTtl);
+const reqstWorks = await fetch("http://localhost:5678/api/works");
+const worksApi = await reqstWorks.json();
 
-//***************Récupération - Éléments généraux******************//
+//***************Éléments généraux******************//
 const modalContainer = document.getElementById("modalContainer");
+//gallerie
+const gallery = document.querySelector(".gallery");
 const bckgrnd = document.getElementById("bckgrnd");
-const modalSB = document.querySelector(".modal");
+//Modale A
+const modalA = document.querySelector(".modal"); //div modal
+const modalSB = document.querySelector(".SB-works"); //div image container
+    // Boutons
+    const btnQuit = document.getElementById("quit"); //fermer la modale
+    const btnAddPh = document.querySelector(".btnAdd"); //Ajouter une photo.
 
-//Modale - Supprimer photos 
-const btnQuit = document.getElementById("quit");
-const btnAddPh = document.querySelector(".btnAdd");
-//Modale - Ajouter photos
-const modalAdd = document.querySelector(".modalAdd");
-const iconQuit = document.getElementById("quit2");
-const iconBack = document.getElementById("back");
-const btnUpload = document.getElementById("btnAdd2"); //input-file (photos)
-const lblinputPh = document.querySelector(".photoAdd label"); //label-bouton réf input. 
+//Modale B  
+const modalB = document.querySelector(".modalAdd");
 
-//post
-const formUpload = document.getElementById("formUpload");
-const picAddPhoto = document.querySelector(".photoAdd");
-const iconAddPhoto = document.querySelector(".photoAdd i");
-const labelAddPhoto = document.querySelector(".photoAdd label");
-const paraghAddPhoto = document.querySelector(".photoAdd p");
-const btnValider = document.getElementById("valider");
+    //Boutons
+    const iconQuit = document.getElementById("quit2"); //fermer
+    const iconBack = document.getElementById("back"); //revenir en arrière
+    const btnAjoutPh = document.getElementById("btnAdd2"); //input > ceci ouvre le menu pour choisir un fichier.
 
+    //formulaire
+    const formUpload = document.getElementById("formUpload");
+        //div container
+        const containerAddPh = document.querySelector(".photoAdd");
+            const iconAddPhoto = document.querySelector(".photoAdd i"); //icone photo
+            const lablBtnAjoutPh = document.querySelector(".photoAdd label"); //+Ajouter photo
+            const paraghAddPhoto = document.querySelector(".photoAdd p");// format photo
+            //Photo temoin
+            const picPh = document.querySelector(".photoAdd img");
+            //champ titre photo 
+            const phNameForm = document.getElementById("phName");
+    //bouton submit.
+    const btnValider = document.getElementById("valider");
 
-//*************Galerie d'images****************/
-
-function gallerySB(imgTtl) {
-    for (let i = 0; i < imgTtl.length; i++) {
+//****************Gallerie traveaux Sophie B**************//
+function gallerySB(worksApi) {
+    for (let i = 0; i < worksApi.length; i++) {
       //création éléments
-        const works = imgTtl[i]
-        const gallery = document.querySelector(".gallery");
-        const sectionWork = document.createElement("figure");
-        const imgWork = document.createElement("img");        
-        imgWork.src = works.imageUrl;
-        const ttlWork = document.createElement("figcaption");
-        ttlWork.innerText = works.title;
+        const works = worksApi[i]
+        const figureGal = document.createElement("figure");
+        const imgWorkGal = document.createElement("img");        
+        imgWorkGal.src = works.imageUrl;
+        const ttlWorkGal = document.createElement("figcaption");
+        ttlWorkGal.innerText = works.title;
       //rattachement DOM
-      gallery.appendChild(sectionWork);
-      sectionWork.appendChild(imgWork);
-      sectionWork.appendChild(ttlWork);
+      gallery.appendChild(figureGal);
+      figureGal.appendChild(imgWorkGal);
+      figureGal.appendChild(ttlWorkGal);
     }
   }
-gallerySB (imgTtl);
+gallerySB (worksApi);
 
-//******************Modale***************//
-
-function modal(imgTtl) {
-    // Elementos que se muestran en la modal
-    //const gallery = document.querySelector(".gallery");
-    const sbPhotos = document.querySelector(".SB-works");
-        
-    imgTtl.forEach((work) => {
-        let sectionWork = document.createElement("figure");
-        
-        const imgWork = document.createElement("img");
-        
-        imgWork.src = work.imageUrl;
-        // Configuramos el dataset para la imagen
-        sectionWork.dataset.workId = work.id; //a figure le estoy agregando un dataset "work-id" que le digo que será igual al id del elemento actual.
-        
-        // Configuramos el dataset para el ícono
-        const iconTrash = document.createElement("i");
-        iconTrash.classList.add("fa-solid", "fa-trash");
-        const divIcon = document.createElement("div");
-        divIcon.classList.add("blackbg");
-        divIcon.dataset.workId = work.id; // Para que se borren al mismo tiempo la imagen y el ícono.
-        // Añadimos los elementos al DOM
-        sectionWork.appendChild(imgWork);
-        divIcon.appendChild(iconTrash);
-        sectionWork.appendChild(divIcon);
-        sbPhotos.appendChild(sectionWork);
-    });
-}
-
-modal(imgTtl);
 
 //***********************FILTRES****************************//
-let catDynamik = await fetch("http://localhost:5678/api/categories");
-let catDynAnsw = await catDynamik.json();
-let catgTtls = catDynAnsw.map(cat => cat.name);
+const catDynamik = await fetch("http://localhost:5678/api/categories");
+const catDynAnsw = await catDynamik.json();
+const catgTtls = catDynAnsw.map(cat => cat.name);
 
 //création des boutons
 function catgBtn(catgTtls) {
     
     catgTtls.unshift("Tous");
     for (let i = 0; i < catgTtls.length; i++) {
-        const multpl = catgTtls[i];
-        const btns = document.createElement("button");
-        btns.classList.add("btnBeigBckg");
-        btns.innerText = multpl;
-        const filtersDiv = document.getElementById("filters");
-        filtersDiv.appendChild(btns);
+        const indexCatgTtls = catgTtls[i];
+        const btnFilters = document.createElement("button");
+        btnFilters.classList.add("btnBeigBckg");
+        btnFilters.innerText = indexCatgTtls;
+        const divFilters = document.getElementById("filters");
+        divFilters.appendChild(btnFilters);
     }
 }
 //changement de couleurs
 function filters() {
     const btnsCtg = document.querySelectorAll("button");
-    const gallery = document.querySelector(".gallery");
-
+    
     btnsCtg.forEach((btn, index) => {
         btn.addEventListener("click", function () {
             btnsCtg.forEach(b => b.classList.remove("btnGreenBckg", "btnBeigBckg"));
@@ -111,9 +86,9 @@ function filters() {
                     b.classList.add("btnGreenBckg");
                 }
             });
-//images qu'apparaissent
-            const filteredImages = imgTtl.filter(function (imgTtl) {
-                return index === 0 || imgTtl.category.id === index;
+//images qui s'affichent
+            const filteredImages = worksApi.filter(function (worksApi) {
+                return index === 0 || worksApi.category.id === index;
             });
 
             gallery.innerHTML = "";
@@ -122,7 +97,9 @@ function filters() {
     });
 }
 
-//*********************Bouton edit************************//
+
+//*********************LAYOUT Page d'accueil************************//
+//Création Bouton edit
 function btnEditHp() {
     const linkEdit = document.createElement("a");
     linkEdit.classList.add("js-modal")
@@ -140,8 +117,8 @@ function btnEditHp() {
     ttlEdit.appendChild(linkEdit);
 }
 
-//****************Home page - Login et Logout*********************//
-function homePageAppearence() {
+//****************Home page - Layout > Login et Logout*********************//
+function homePageLayout() {
     const logIn = document.getElementById("logIn");
     const userConnected = localStorage.getItem("token");
     if (userConnected) {
@@ -163,92 +140,167 @@ function homePageAppearence() {
             logOut.setAttribute("id", "logIn")
         }
     });
-
 }
-homePageAppearence();
+homePageLayout();
 
-//************* Modale - interface/layout*********************//
-function openModal() {
-    const btnEdit = document.querySelector(".btnEdit");
-
-    btnEdit.addEventListener("click", () => {
-        bckgrnd.classList.remove("displayOff");
+//******************************MODALES*************************//
+//Éléments de la modale//
+function mdlElements(worksApi) {
+       
+    const sbPhotos = document.querySelector(".SB-works");
+        
+    worksApi.forEach((work) => {
+        let figureMdl = document.createElement("figure");
+        
+        const imgWorkMdl = document.createElement("img");
+        
+        imgWorkMdl.src = work.imageUrl;
+        // Configuration dataset figure image
+        figureMdl.dataset.workId = work.id;
+        
+        // Configuration dataset icône
+        const iconTrash = document.createElement("i");
+        iconTrash.classList.add("fa-solid", "fa-trash");
+        const divIcon = document.createElement("div");
+        divIcon.classList.add("blackbg");
+        divIcon.dataset.workId = work.id; 
+        // Ajout d'éléments au DOM
+        figureMdl.appendChild(imgWorkMdl);
+        divIcon.appendChild(iconTrash);
+        figureMdl.appendChild(divIcon);
+        sbPhotos.appendChild(figureMdl);
     });
 }
-openModal();
 
-//Modale permettant d'effacer les photos.
-function ModalDel() {
+mdlElements(worksApi);
+
+//************* Modale A*********************//
+//Ouvrir modale A
+function openAModal() {
+    const btnEdit = document.querySelector(".btnEdit");
+
+    btnEdit.addEventListener("click", (e) => {
+        console.log("modal A")
+        e.preventDefault;
+        bckgrnd.classList.remove("displayOff");
+        delWorks();
+        
+    });
+}
+openAModal();
+
+//Fermer modal A
+function closeAModal() {
     btnQuit.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
     });
     bckgrnd.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
-    })
-    modalSB.addEventListener("click", (e) => {
+    });
+    modalA.addEventListener("click", (e) => {
         e.stopPropagation();
-    })
+    });
     btnAddPh.addEventListener("click", function () {
-        modalSB.classList.add("displayOff");
-    })
-
+        modalA.classList.add("displayOff");
+        });
 }
-ModalDel();
+closeAModal();
 
-//Retour à la première modale
-function mdlMoveBack() {
+//************************** MODAL B *********************//
+
+//créer une petite image sur la modal B
+function newPicMdl () {
+    btnAjoutPh.addEventListener("change", () => {
+        let imgLocal = btnAjoutPh.files[0];
+        console.log(imgLocal);
+        const urlPhotos = URL.createObjectURL(imgLocal);
+        const img = document.createElement("img");
+        img.src = urlPhotos;
+        containerAddPh.appendChild(img);
+        if (containerAddPh.appendChild(img)) {
+            iconAddPhoto.classList.add("displayOff");
+            lablBtnAjoutPh.classList.add("displayOff");
+            paraghAddPhoto.classList.add("displayOff");
+            }
+        });
+    }
+newPicMdl();
+
+//retablir le layaout de la modale B
+function clearBModal (){
+    const picBModal = document.querySelector(".photoAdd img");
+    if (picBModal){
+    picBModal.remove();
+    iconAddPhoto.classList.remove("displayOff");
+    lablBtnAjoutPh.classList.remove("displayOff");
+    paraghAddPhoto.classList.remove("displayOff");
+    }
+    phNameForm.value="";
+}
+
+//Ouvrir modal B
+function openBModal (){
+    const btnMdlAjout = btnAddPh.addEventListener("click", ()=>{
+        console.log("Modal B");
+        clearBModal();
+
+    })
+}
+openBModal();
+
+AddWork();
+
+
+//Retour à la modale A
+function backToAMdl() {
     iconBack.addEventListener("click", function () {
-        modalSB.classList.remove("displayOff");
-
-    })
+        modalA.classList.remove("displayOff");
+    });
 }
-mdlMoveBack();
+backToAMdl();
 
-//Modale permettant d'ajouter des photos.
-function mdlAddClose() {
+
+//Fermer modal B
+function closeBModal() {
+    //ceci ferme la modale quand j'appuie sur l'icon x
     iconQuit.addEventListener("click", function () {
         bckgrnd.classList.add("displayOff");
-        modalSB.classList.remove("displayOff");
+        modalA.classList.remove("displayOff");
     });
+
+    //ceci ferme la modale quand j'appuie sur le BG
     bckgrnd.addEventListener("click", () => {
         bckgrnd.classList.add("displayOff");
-        modalSB.classList.remove("displayOff");
-    })
-    modalAdd.addEventListener("click", (e) => {
+        modalA.classList.remove("displayOff");
+   })
+    //ceci evite que la modale se ferme quand j'appuie ailleurs que dans l'icone et le BG
+    modalB.addEventListener("click", (e) => {
         e.stopPropagation();
     })
-
+    //ceci ferme la modale quand j'appuie sur Esc.
     window.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
             bckgrnd.classList.add("displayOff");
-            modalSB.classList.remove("displayOff");
+            modalA.classList.remove("displayOff");
         }
     });
 
 }
-mdlAddClose();
+closeBModal();
 
-//Bouton - ajout des photos.
-function addPhotoInput() {
-    lblinputPh.addEventListener("click", function (event) {
-        event.btnUpload;
-    })
-}
-addPhotoInput();
-
-
-//************************Requests API********************//
-//DELETE//
-const btnTrash = document.querySelectorAll(".blackbg");
-for (let index = 0; index < btnTrash.length; index++) {
-    const workId = btnTrash[index].dataset.workId;
-    btnTrash[index].addEventListener("click", async function (event) {
-        event.preventDefault()
+//********************************* Requêtes API **************************//
+//DELETE
+function delWorks() {
+    const btnTrash = document.querySelectorAll(".blackbg");
+    btnTrash.forEach((btn)=> btn.addEventListener("click", async function (e){
+        e.preventDefault();
+        const workId = btn.dataset.workId;
+    
         if (window.confirm("Êtes-vous sûr(e) de vouloir effacer cette image?")){
             const tokenLS = localStorage.getItem("token")
             localStorage.setItem("last-work-id-deleted", workId);
-            const indxImgTtl = imgTtl.findIndex(item => item.id === workId); // index des éléments = workId
-            imgTtl.splice(indxImgTtl, 1); //j'efface l'élément actuel du tableau.
+            const indxImgTtl = worksApi.findIndex(item => item.id == workId); // index des éléments = workId
+            worksApi.splice(indxImgTtl, 1); //j'efface l'élément actuel du tableau.
             let request = new Request(`http://localhost:5678/api/works/${workId}`);
             let option = {
                 method: "DELETE",
@@ -259,93 +311,72 @@ for (let index = 0; index < btnTrash.length; index++) {
                 }
             };
         let response = await fetch(request, option);
-        console.log(response);
         bckgrnd.classList.add("displayOff");
                                                 
         if (response.ok){
             //j'efface les éléments de la modale
-            const modalSB = document.querySelector(".SB-works");
             modalSB.innerHTML="";
-            modal(imgTtl);
+            mdlElements(worksApi);
             //j'efface les éléments de la galerie 
-            const gallery = document.querySelector(".gallery");
             gallery.innerHTML="";
-            gallerySB(imgTtl);
+            gallerySB(worksApi);
                 
         } else {
                 alert("Une erreur est survenue. Veuillez réessayer.");
           };
         }
-    });
+    }));
 }
 
-
-//*******************POST******************************//
-//Modale - ajout de photo
-btnUpload.addEventListener("change", () => {
-    let imgLocal = btnUpload.files[0];
-    const urlPhotos = URL.createObjectURL(imgLocal);
-    const img = document.createElement("img");
-    img.src = urlPhotos;
-    picAddPhoto.appendChild(img);
-    if (picAddPhoto.appendChild(img)) {
-        iconAddPhoto.classList.add("displayOff");
-        labelAddPhoto.classList.add("displayOff");
-        paraghAddPhoto.classList.add("displayOff");
-    }
-});
-
-//
-formUpload.addEventListener("submit", async function (event) {
-    event.preventDefault();
-    const tokenLS = localStorage.getItem("token");
-    const formData = new FormData();
-    const catgVal = event.target.querySelector("[name=category]").value;
-    let catgId = "";
-    if (catgVal === "Objets") {
-        catgId = "1";
-    }
-    else if (catgVal === "Appartements") {
-        catgId = "2";
-    } else if (catgVal === "Hotels & Restaurants") {
-        catgId = "3";
-    }
-
-    formData.append("category", catgId);
-    formData.append("title", event.target.querySelector("[name=phName]").value)
-    formData.append("image", event.target.querySelector("[name=file]").files[0])
-
-    //J'efface la petite image de la photo à ajouter et j'efface le champ Titre.
-    const picPh = document.querySelector(".photoAdd img");
-    const phNameForm = document.getElementById("phName");
-    phNameForm.value=""; 
-    picPh.remove();
-    
-    //Je fais ré apparaître l'interface pour ajouter une photo.
-    iconAddPhoto.classList.remove("displayOff");
-    labelAddPhoto.classList.remove("displayOff");
-    paraghAddPhoto.classList.remove("displayOff");
-    
-    const request = await fetch(`http://localhost:5678/api/works`, {
-        method: "POST",
-        body: formData,
-        headers: {
-            "Accept": "application/json",
-            "Authorization": `Bearer ${tokenLS}`,
+//POST
+function AddWork() {
+    formUpload.addEventListener("submit", async function (event) {
+        console.log("addWork");
+        event.preventDefault();
+        const tokenLS = localStorage.getItem("token");
+        const formData = new FormData();
+        const catgVal = event.target.querySelector("[name=category]").value;
+        let catgId = "";
+        if (catgVal === "Objets") {
+            catgId = "1";
         }
+        else if (catgVal === "Appartements") {
+            catgId = "2";
+        } else if (catgVal === "Hotels & Restaurants") {
+            catgId = "3";
+        }
+        let nameVal = event.target.querySelector("[name=phName]").value;
 
-    })
-    bckgrnd.classList.add("displayOff");
-    modalSB.classList.remove("displayOff");
+        formData.append("title", nameVal);
+        formData.append("category", catgId);
+        formData.append("image", event.target.querySelector("[name=file]").files[0])
 
-    if (request.ok){
-        const response = await request.json();
-        imgTtl.push(response);
-        const modalSB = document.querySelector(".SB-works");
-        modalSB.innerHTML="";
-        modal(imgTtl);
-        const gallery = document.querySelector(".gallery");
-        gallery.innerHTML="";
-        gallerySB(imgTtl);
-    }       
-});
+
+        const request = await fetch(`http://localhost:5678/api/works`, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Accept": "application/json",
+                "Authorization": `Bearer ${tokenLS}`,
+            }
+
+        })
+
+        if (request.ok) {
+            bckgrnd.classList.add("displayOff");
+            modalA.classList.remove("displayOff");  
+            const response = await request.json();
+            worksApi.push(response);
+            modalSB.innerHTML = "";
+            mdlElements(worksApi);
+            gallery.innerHTML = "";
+            gallerySB(worksApi);
+        }else if (request.status === 400){
+            alert("Veillez donner un titre à l'image");       
+            
+        }else {
+            console.error("Error:", request.status);
+        }
+        
+    });
+}
